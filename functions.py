@@ -23,14 +23,15 @@ def read_in_file(filename):
     return variables
 
 def get_params(params):
-    theta0 = params.get("theta0", 0.0)
-    thetadot0 = params.get("thetadot0", 0.0)
-    mu = params.get("mu", 0.0)
-    B0 = params.get("B0", 0.0)
-    m = params.get("m", 0.0)
-    L = params.get("L", 0.0)
-    w0 = np.sqrt(12 * mu * B0 / (m * L**2))
-    return theta0, thetadot0, mu, B0, m, L, w0
+    tFin = params.get("tFin", 0.0)
+    m1 = params.get("m1", 0.0)
+    m2 = params.get("m2", 0.0)
+    x0 = params.get("x0", 0.0)
+    v0x = params.get("v0x", 0.0)
+    v0y = params.get("v0y", 0.0)
+    a = params.get("a", 0.0)
+    tol = params.get("tol", 0.0)
+    return tFin, m1, m2, x0, v0x, v0y, a, tol
 
 def run_simulation(executable, input_filename, output_template, **params):
 
@@ -52,3 +53,12 @@ def run_simulation(executable, input_filename, output_template, **params):
         print(f" ERROR: The output file '{output_filename}' was NOT created!")
 
     return output_filename, result
+
+def run_param_sweep(param_name, values, fixed_params):
+    outputs = []
+    for val in values:
+        params = fixed_params.copy()
+        params[param_name] = val
+        output_template = f"output_{param_name}_{{{param_name}}}.out"
+        outname, result = run_simulation(executable, input_filename, output_template, **params)
+        outputs.append(outname)
