@@ -12,10 +12,10 @@ class Exercice3
 
 private:
   double t, dt, tFin;
-  double a;
+  double x0,a;
   double GM=6.674e-11;
   double mtot=0e0;
-  double L2x,L2y;
+  double Omega = sqrt(GM*(mtot)/pow(a,3));
   valarray<double> m = std::valarray<double>(0.e0, 2);
   valarray<double> v0 = std::valarray<double>(0.e0, 2);
   int N_excit, nsteps;
@@ -61,9 +61,7 @@ private:
 
       double rS = sqrt( pow(y[2] - x_prime_S,2)+pow( y[3],2) );
       double rJ = sqrt( pow(y[2] - x_prime_J,2)+pow( y[3],2) ); //y = (vx, vy, x, y)
-      
-      double Omega = sqrt(GM*(mtot)/pow(a,3));
-      
+            
       ydot[0] = -GM * (m[0]/pow(rS, 3)*(y[2] - x_prime_S) - m[1]/pow(rJ, 3)*(y[2] - x_prime_J)) +pow(Omega,2)*y[2] + 2*Omega*y[1];
       ydot[1] =  -GM * y[3] * (m[0]/pow(rJ, 3) - m[1]/pow(rJ, 3)) + pow(Omega,2)*y[3] - 2*Omega*y[0];
     }
@@ -98,8 +96,6 @@ double get_Epot(double xx, double yy) {
       double rS = sqrt( pow((xx - x_prime_S ),2) + pow( yy,2) ); 
       double rJ = sqrt( pow((xx- x_prime_J ),2) + pow( yy,2) );  
 
-      double Omega = sqrt(GM*(mtot)/pow(a,3));
-
       V = - GM * (m[0]/rS + m[1]/rJ) - 0.5*pow(Omega,2)*(pow(xx,2)+pow(yy,2));
       return V;
     }
@@ -124,13 +120,13 @@ void initial_condition(void){
   if(nsel_physics==1){
     y[0] = v0[0];
     y[1] = v0[1];
-    y[2] = 2*a;
+    y[2] = x0;
     y[3] = 0;
   }
   else{
     y[0] = v0[0];
-    y[1] = v0[1];
-    y[2] = 2*a - alpha*a;
+    y[1] = v0[1] - Omega*x0;
+    y[2] = x0 - alpha*a;
     y[3] = 0;
   }
 }
