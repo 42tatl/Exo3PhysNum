@@ -47,17 +47,20 @@ private:
   std::valarray<double> get_f(double t, const std::valarray<double>& x) {
     std::valarray<double> xdot(0.0, 4);
     //TO DO
-    if (nsel_physics == 1) {
+    if (nsel_physics == 1) { //two body problem 
       
-        xdot[2] =0;
-        xdot[3] = 0;
+      double r = sqrt(pow(x[0],2)+ pow(x[1],2));
+      xdot[2] = -(GM*m[1]*x[0])/pow(r,3);
+      xdot[3] = -(GM*m[1]*x[1])/pow(r,3);
     }
-    else if (nsel_physics == 2) {
-
-        
-                 
-        xdot[2] = 0;
-        xdot[3] =  0;
+    else if (nsel_physics == 2) { //reduced three body problem
+      double rs = sqrt( pow((x[0]+alpha*a ),2)+pow( x[1],2) );
+      double rt = sqrt( pow((x[0]-beta*a ),2)+pow( x[1],2) );
+      
+      double Omega = sqrt(GM*(mtot)/pow(a,3));
+      
+      xdot[2] = -GM*m[0]/pow(rs, 3)*(x[0] + alpha*a) -GM*m[1]/pow(rt, 3)*(x[0] - beta*a) +pow(Omega,2)*x[0] + 2*Omega*x[3];
+      xdot[3] =  -GM*m[0]/pow(rs, 3)*x[1] -GM*m[1]/pow(rt, 3)*x[1] +pow(Omega,2)*x[1] - 2*Omega*x[2];
     }
     else{
         cerr << "No dynamics corresponds to this index" << endl;
@@ -74,13 +77,38 @@ private:
 
 // Function to compute potential energy per mass in R (nsel_physics=1) or in R'(nsel_physics=2)
 double get_Epot(double xx, double yy) {
-    //TO DO
-    return 0;
+    double V=0;
+    if (nsel_physics==1) {
+      V=-GM*m[0]/sqrt(pow(xx,2)+pow(yy,2))-GM*m[1]/sqrt(pow(xx,2)+pow(yy,2));
+      return V;
+    }
+    else if (nsel_physics==2){
+      double rs = sqrt( pow((xx+alpha*a ),2)+pow( yy,2) );
+      double rt = sqrt( pow((xx-beta*a ),2)+pow( yy,2) );  
+      double Omega = sqrt(GM*(mtot)/pow(a,3));
+      V = -GM*m[0]/rs - GM*m[1]/rt - 0.5*pow(Omega,2)*(pow(xx,2)+pow(yy,2));
+      return V;
+    }
+    else{
+      cerr << "No dynamics corresponds to this index" << endl;
+      return 0;
+    }
 }
 
 // Function to compute mechanical energy per mass in R'
 double compute_energy(double xx, double yy, double vx, double vy) {
-    //TO DO
+    double T = 0.5*(pow(vx,2)+pow(vy,2));
+    if (nsel_physics==1){
+      return get_Epot(xx,yy) + T;
+    }
+    else if (nsel_physics==2){
+      return get_Epot(xx,yy) + T;
+    }
+    else{
+      cerr << "No dynamics corresponds to this index" << endl;
+      return 0;
+    }
+
     return 0;
 }
 void initial_condition(void){
@@ -95,7 +123,14 @@ void initial_condition(void){
 std::valarray<double> RK4_do_onestep(const std::valarray<double>& yold, double ti, double dt) {
     std::valarray<double> k1, k2, k3, k4, ynew;
     //TO DO
-    ynew=yold;
+      
+    k1=dt*get_f(ti , yold);
+    k2=dt*get_f( ti+(dt/2.0) , yold + (k1/2.0));
+    k3=dt*get_f( ti+dt/2.0 , yold + (k2/2.0) );
+    k4=dt*get_f( ti+dt , yold+k3 );
+    
+    ynew= yold + ( k1+2.0*k2+2.0*k3+k4 )/6.0;  //Final computation
+
     return ynew;
 }
 
@@ -155,10 +190,18 @@ public:
     std::valarray<double> y1;
     std::valarray<double> y2;
     if (adapt==false){
-      //To DO fixed dt scheme
+      cout<<"non adaptive"<<endl;
+      while(t<tFin-0.5*dt){
+        x = RK4_do_onestep(x,t,dt);
+        t += dt;
+        printOut(false); 
+      } 
+        
     }
     else{
       //TO DO adaptive case
+      cout<<"Adaptive case"<<endl;
+      nsteps = 0;
     };
     
     printOut(true); // ecrire le dernier pas de temps
