@@ -54,7 +54,7 @@ def run_simulation(executable, input_filename, output_template, **params):
 
     return output_filename, result
 
-def run_param_sweep(param_name, values, fixed_params):
+def run_param_sweep(executable, input_filename, param_name, values, fixed_params):
     outputs = []
     for val in values:
         params = fixed_params.copy()

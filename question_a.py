@@ -14,7 +14,7 @@ params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
-outputs_nsteps = fct.run_param_sweep("nsteps", [10, 20, 50, 100], {"adapt": False, "tol": 30})
-outputs_tol    = fct.run_param_sweep("tol", [10, 20, 30], {"adapt": True, "nsteps": 100})
+outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [10, 20, 50, 100], {"adapt": False, "tol": 30})
+outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [10, 20, 30], {"adapt": True, "nsteps": 100})
 
 
