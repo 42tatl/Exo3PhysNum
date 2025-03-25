@@ -50,13 +50,13 @@ private:
     //TO DO
     if (nsel_physics == 1) { //two body problem 
       
-      double r = sqrt(pow(y[0],2)+ pow(y[1],2)); //y = (vx, vy, x, y)
+      double r = sqrt(pow(y[2],2)+ pow(y[3],2)); //y = (vx, vy, x, y) PROBLEME ICI: PQ ON PREND PAS X_S
     
-      ydot[0] = -(GM*m[1]*y[2])/pow(r,3);
-      ydot[1] = -(GM*m[1]*y[3])/pow(r,3);
+      ydot[0] = -(GM*m[0]*y[2])/pow(r,3); 
+      ydot[1] = -(GM*m[0]*y[3])/pow(r,3);
     }
     else if (nsel_physics == 2) { //reduced three body problem
-      double x_prime_S = -alpha*a;
+      double x_prime_S = -alpha*a; 
       double x_prime_J = beta*a;
 
       double rS = sqrt( pow(y[2] - x_prime_S,2)+pow( y[3],2) );
@@ -86,7 +86,7 @@ double get_Epot(double xx, double yy) {
     if (nsel_physics==1) {
       double r = sqrt(pow(xx,2)+pow(yy,2));
 
-      V= -GM * (m[0] + m[1]) / r;
+      V= -GM * m[0] / r; //PB: POURQUOI ON AURAIT M[0]+M[1] DANS LE CAS 1
       return V;
     }
 
@@ -195,7 +195,7 @@ public:
     {
         t = 0.0;
         initial_condition();
-        y = y0;
+        //y = y0;
         last = 0;
         printOut(true);
 
