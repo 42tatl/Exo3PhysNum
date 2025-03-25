@@ -230,7 +230,7 @@ public:
 
             y = y_half2;
             t += dt_c;
-            dt = dt_c * pow(tol / d, 1.0 / (n + 1));
+            dt = dt_c * pow(tol / d, 1.0 / (n + 1)); //je suis pas sure de comprendre si la boucle recommence si on a direct d<epsilon
             dt = std::min(dt, tFin - t);
 
             ++nsteps;
