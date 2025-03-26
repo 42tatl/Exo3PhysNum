@@ -15,8 +15,8 @@ params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
-outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [5000], {"adapt": False, "tol": 30})
-#outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [10, 20, 30], {"adapt": True, "nsteps": 100})
+outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [8000], {"adapt": False, "tol": 30})
+#outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [30], {"adapt": True, "nsteps": 1000})
 
 
 def read_output_file(filename):
@@ -36,6 +36,12 @@ def plot_trajectory(x, y, label=""):
     #plt.axis("equal")
     plt.grid(True)
 
+def plot_energy(t, energy, label=""):
+    plt.plot(t, energy, label=label)
+    plt.xlabel("t [s]")
+    plt.ylabel("Energie per mass [J/kg]")
+    plt.grid(True)
+
 
 #Fixed time step
 for output in outputs_nsteps:
@@ -46,5 +52,27 @@ plt.title("Trajectoires avec pas de temps fixe")
 plt.legend()
 plt.show()
 
+for output in outputs_nsteps:
+    t, x, y, vx, vy, energy = read_output_file(output)
+    plot_energy(t, energy, label=output)
+plt.title("Énergie (pas fixe)")
+plt.legend()
+plt.show()
 
+'''
+#Adaptive time step
+for output in outputs_tol:
+    t, x, y, vx, vy, energy = read_output_file(output)
+    label = output.split("/")[-1]
+    plot_trajectory(x, y, label=label)
+plt.title("Trajectoires avec pas adaptatif")
+plt.legend()
+plt.show()
 
+for output in outputs_tol:
+    t, x, y, vx, vy, energy = read_output_file(output)
+    plot_energy(t, energy, label=output)
+plt.title("Énergie (adaptatif)")
+plt.legend()
+plt.show()
+'''

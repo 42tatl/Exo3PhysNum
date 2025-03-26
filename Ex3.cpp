@@ -195,7 +195,6 @@ public:
     {
         t = 0.0;
         initial_condition();
-        //y = y0;
         last = 0;
         printOut(true);
 
