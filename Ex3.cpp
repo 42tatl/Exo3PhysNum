@@ -106,7 +106,7 @@ double get_Epot(double xx, double yy) {
 }
 
 // Function to compute mechanical energy per mass in R'
-double compute_energy(double xx, double yy, double vx, double vy) { //PER MASS
+double compute_energy(double vx, double vy, double xx, double yy) { //PER MASS
     double T = 0.5*(pow(vx,2)+pow(vy,2));
     if (nsel_physics==1 or nsel_physics==2) {
       return T + get_Epot(xx,yy);

@@ -51,6 +51,7 @@ for output in outputs_nsteps:
 plt.title("Trajectoires avec pas de temps fixe")
 plt.legend()
 plt.show()
+plt.savefig('trajectoires.pdf')
 
 for output in outputs_nsteps:
     t, x, y, vx, vy, energy = read_output_file(output)
@@ -58,6 +59,8 @@ for output in outputs_nsteps:
 plt.title("Énergie (pas fixe)")
 plt.legend()
 plt.show()
+plt.savefig('energie.pdf')
+
 
 '''
 #Adaptive time step
