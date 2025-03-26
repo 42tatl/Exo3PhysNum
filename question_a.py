@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import functions as fct
 
-executable = './Exe'  # Remove .exe for Mac
+executable = './Exe2'  # Remove .exe for Mac
 repertoire = r"/Users/lilimouelle/Desktop/PHYSNUM/Exo3PhysNum"  # Modify for correct directory
 os.chdir(repertoire)
 
@@ -15,8 +15,8 @@ params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
-outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [8000], {"adapt": 0, "tol": 30})
-#outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [30], {"adapt": True, "nsteps": 1000})
+#outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [8000], {"adapt": 0, "tol": 30})
+outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [1,0.1,0.01], {"adapt": True, "nsteps": 1000})
 
 
 def read_output_file(filename):
@@ -42,40 +42,39 @@ def plot_energy(t, energy, label=""):
     plt.ylabel("Energie per mass [J/kg]")
     plt.grid(True)
 
-
+'''
 #Fixed time step
 for output in outputs_nsteps:
     t, x, y, vx, vy, energy = read_output_file(output)
     label = output.split("/")[-1]
     plot_trajectory(x, y, label=label)
-plt.title("Trajectoires avec pas de temps fixe")
 plt.legend()
-plt.show()
 plt.savefig('trajectoires.pdf')
+plt.show()
+
 
 for output in outputs_nsteps:
     t, x, y, vx, vy, energy = read_output_file(output)
     plot_energy(t, energy, label=output)
-plt.title("Énergie (pas fixe)")
 plt.legend()
-plt.show()
 plt.savefig('energie.pdf')
-
-
+plt.show()
 '''
+
+
+
 #Adaptive time step
 for output in outputs_tol:
     t, x, y, vx, vy, energy = read_output_file(output)
     label = output.split("/")[-1]
     plot_trajectory(x, y, label=label)
-plt.title("Trajectoires avec pas adaptatif")
 plt.legend()
+plt.savefig('trajectoires_adapt.pdf')
 plt.show()
 
 for output in outputs_tol:
     t, x, y, vx, vy, energy = read_output_file(output)
     plot_energy(t, energy, label=output)
-plt.title("Énergie (adaptatif)")
 plt.legend()
+plt.savefig('energie_adapt.pdf')
 plt.show()
-'''
