@@ -65,9 +65,5 @@ def run_param_sweep(executable, input_filename, param_name, values, fixed_params
         output_template = f"output_{param_name}_{{{param_name}}}.out"
         outname, result = run_simulation(executable, input_filename, output_template, **params)
         outputs.append(outname)
-<<<<<<< HEAD
 
     return outputs
-=======
-    return outputs
->>>>>>> 3a4e8e688516d8466f6f22cf8394ff9f82dbfc7f
