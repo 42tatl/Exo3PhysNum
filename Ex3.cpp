@@ -15,7 +15,7 @@ private:
   double x0,a;
   double GM=6.674e-11;
   double mtot=0e0;
-  double Omega = sqrt(GM*(mtot)/pow(a,3));
+  double Omega;
   valarray<double> m = std::valarray<double>(0.e0, 2);
   valarray<double> v0 = std::valarray<double>(0.e0, 2);
   int N_excit, nsteps;
@@ -120,13 +120,13 @@ void initial_condition(void){
   if(nsel_physics==1){
     y[0] = v0[0];
     y[1] = v0[1];
-    y[2] = x0;
+    y[2] = 2*a;
     y[3] = 0;
   }
   else{
     y[0] = v0[0];
-    y[1] = v0[1] - Omega*x0;
-    y[2] = x0 - alpha*a;
+    y[1] = v0[1] - Omega*2*a;
+    y[2] = 2*a - alpha*a;
     y[3] = 0;
   }
 }
@@ -174,7 +174,7 @@ public:
         mtot = m[0] + m[1];
         alpha = m[1] / mtot;
         beta  = m[0] / mtot;
-
+        Omega = sqrt(GM*(mtot)/pow(a,3));
         outputFile = new ofstream(configFile.get<string>("output").c_str());
         outputFile->precision(15);
 

@@ -8,5 +8,4 @@ nsel_physics = 2
 adapt = 0
 tol = 30
 sampling = 1 //frequency of data writing
-output = output.out
 nsteps = 3000 
