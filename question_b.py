@@ -5,7 +5,7 @@ import os
 import functions as fct
 
 repertoire = r"C:\Users\Avril\Desktop\Exo3PhysNum"  
-executable = os.path.join(repertoire, "Exe44.exe")
+executable = os.path.join(repertoire, "Exe42.exe")
 os.chdir(repertoire)
 input_filename = "configb.txt"
 output_template = "output_{paramstr}_{value}.out"
