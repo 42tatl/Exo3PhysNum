@@ -14,12 +14,12 @@ params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
-outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [1000], {"adapt": False, "tol": 30})
-#outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [30], {"adapt": True, "nsteps": 100})
+#outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [1000], {"adapt": 0, "tol": 30})
+outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [30], {"adapt": 1, "nsteps": 100})
 
 plt.figure()
 plt.title("Trajectories")
-for output in outputs_nsteps:
+for output in outputs_tol:
     t, vx, vy, x, y, E, nsteps = np.loadtxt(output, unpack=True)
     plt.plot(x, y, label=output)
     plt.legend()
