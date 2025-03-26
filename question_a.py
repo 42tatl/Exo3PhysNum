@@ -1,6 +1,7 @@
 import numpy as np
 import subprocess
 import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
 import os
 import functions as fct
 
@@ -15,8 +16,8 @@ params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
-outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [8000], {"adapt": 0, "tol": 30})
-#outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [1,0.1,0.01], {"adapt": True, "nsteps": 1000})
+#outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [8000,10000,90000], {"adapt": 0, "tol": 30})
+outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [1,0.1,0.01], {"adapt": True, "nsteps": 1000})
 
 
 def read_output_file(filename):
@@ -42,40 +43,53 @@ def plot_energy(t, energy, label=""):
     plt.ylabel("Energie per mass [J/kg]")
     plt.grid(True)
 
-
+'''
 #Fixed time step
 for output in outputs_nsteps:
     t, x, y, vx, vy, energy = read_output_file(output)
-    label = output.split("/")[-1]
-    plot_trajectory(x, y, label=label)
-plt.legend()
-plt.savefig('trajectoires.pdf')
-plt.show()
+    label = output.split("_")[-1].replace(".out", "")
+    n_label = f"nsteps = {label}"   
+    plot_trajectory(x, y, label=n_label)
+    ax = plt.gca()  # get current axis
+    soleil = Circle((0, 0), radius=0.05e12, color='yellow', zorder=10)
+    ax.add_patch(soleil)
+    plt.legend()
+    plt.axis("equal")
+    plt.savefig(f"traja_{label}.pdf")
+    plt.show()
 
 
 for output in outputs_nsteps:
     t, x, y, vx, vy, energy = read_output_file(output)
-    plot_energy(t, energy, label=output)
-plt.legend()
-plt.savefig('energie.pdf')
-plt.show()
-
-
-
+    label = output.split("_")[-1].replace(".out", "")
+    n_label = f"nsteps = {label}"  
+    plot_energy(t, energy, label=n_label)
+    plt.legend()
+    plt.savefig(f"energiea_{label}.pdf")
+    plt.show()
 '''
+
+
+
 #Adaptive time step
 for output in outputs_tol:
     t, x, y, vx, vy, energy = read_output_file(output)
-    label = output.split("/")[-1]
-    plot_trajectory(x, y, label=label)
-plt.legend()
-plt.savefig('trajectoires_adapt.pdf')
-plt.show()
+    label = output.split("_")[-1].replace(".out", "")
+    eps_label = f"epsilon = {label}"   
+    plot_trajectory(x, y, label=eps_label)
+    ax = plt.gca()  # get current axis
+    soleil = Circle((0, 0), radius=0.05e12, color='yellow', zorder=10)
+    ax.add_patch(soleil)
+    plt.legend()
+    plt.axis("equal")
+    plt.savefig(f"traja_adapt_{label}.pdf")
+    plt.show()
 
 for output in outputs_tol:
     t, x, y, vx, vy, energy = read_output_file(output)
-    plot_energy(t, energy, label=output)
-plt.legend()
-plt.savefig('energie_adapt.pdf')
-plt.show()
-'''
+    label = output.split("_")[-1].replace(".out", "")
+    eps_label = f"epsilon = {label}"   
+    plot_energy(t, energy, label=eps_label)
+    plt.legend()
+    plt.savefig(f"energiea_adapt_{label}.pdf")
+    plt.show()
