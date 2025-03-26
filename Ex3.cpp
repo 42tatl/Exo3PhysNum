@@ -188,52 +188,59 @@ public:
     }
 
     void run()
-    {
-        t = 0.0;
-        initial_condition();
-        last = 0;
-        printOut(true);
+{
+    t = 0.0;
+    initial_condition();
+    last = 0;
+    printOut(true); // First output
 
-        if (!adapt) {
-          cout << "non adaptive" << std::endl;
-          while (t < tFin - 0.5 * dt) {
-              y = RK4_do_onestep(y, t, dt);
-              t += dt;
-              printOut(false);
-          }
-        } 
-        else {
-          cout << "Adaptive case" << std::endl;
-          nsteps = 0;
-          double dt_c;
-          const int n = 4;
-          const double f = 0.9;
+    if (!adapt) {
+        cout << "Non-adaptive case" << endl;
 
-          while (t < tFin - 0.5 * dt) {
-            dt_c = dt;
-            valarray<double> y_full  = RK4_do_onestep(y, t, dt_c);
-            valarray<double> y_half1 = RK4_do_onestep(y, t, dt_c / 2.0);
-            valarray<double> y_half2 = RK4_do_onestep(y_half1, t + dt_c / 2.0, dt_c / 2.0);
+        while (t < tFin - 0.5 * dt) {
+            y = RK4_do_onestep(y, t, dt);
+            t += dt;
+            printOut(false); // Regular sampling
+        }
+    } 
+    else {
+        cout << "Adaptive case" << endl;
+        double jsteps = 0;
+        const int n = 4;
+        const double f = 0.9;
+
+        while (t < tFin) {
+            dt = min(dt, tFin - t);
+            ++jsteps;
+
+            valarray<double> y_full  = RK4_do_onestep(y, t, dt);
+            valarray<double> y_half1 = RK4_do_onestep(y, t, dt / 2.0);
+            valarray<double> y_half2 = RK4_do_onestep(y_half1, t + dt / 2.0, dt / 2.0);
             double d = abs(y_full - y_half2).sum();
-            while (d > tol) {
-                dt_c = f * dt * pow(tol / d, 1.0 / (n + 1));
-                y_full  = RK4_do_onestep(y, t, dt_c);
-                y_half1 = RK4_do_onestep(y, t, dt_c / 2.0);
-                y_half2 = RK4_do_onestep(y_half1, t + dt_c / 2.0, dt_c / 2.0);
-                d = abs(y_full - y_half2).sum();
+
+            if (d <= tol) {
+                y = y_half2;
+                t += dt;
+                dt = f * dt * pow(tol / d, 1.0 / (n + 1));
+            } 
+            else {
+                while (d > tol) {
+                    dt = f * dt * pow(tol / d, 1.0 / (n + 1));
+                    y_full  = RK4_do_onestep(y, t, dt);
+                    y_half1 = RK4_do_onestep(y, t, dt / 2.0);
+                    y_half2 = RK4_do_onestep(y_half1, t + dt / 2.0, dt / 2.0);
+                    d = abs(y_full - y_half2).sum();
+                }
+                y = y_half2;
+                t += dt;
             }
 
-            y = y_half2;
-            t += dt_c;
-            dt = dt_c * pow(tol / d, 1.0 / (n + 1)); //je suis pas sure de comprendre si la boucle recommence si on a direct d<epsilon
-            dt = std::min(dt, tFin - t);
-
-            ++nsteps;
-            printOut(false);
-          }
-      }
-      printOut(true); // final output
+            printOut(false); // Regular sampling
+        }
     }
+
+    printOut(true); // Final output
+}
 };
 
 int main(int argc, char* argv[])
