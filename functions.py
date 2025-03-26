@@ -3,7 +3,8 @@ import subprocess
 import matplotlib.pyplot as plt
 import os
 
-def read_in_file(filename):
+def read_in_file(filename): 
+    '''Reads in a file and returns the data as a list of floats'''
     variables = {}
     with open(filename, "r") as file:
         for line in file:
@@ -23,6 +24,7 @@ def read_in_file(filename):
     return variables
 
 def get_params(params):
+    '''Extracts the parameters from the dictionary'''
     tFin = params.get("tFin", 0.0)
     m1 = params.get("m1", 0.0)
     m2 = params.get("m2", 0.0)
@@ -34,6 +36,7 @@ def get_params(params):
     return tFin, m1, m2, x0, v0x, v0y, a, tol
 
 def run_simulation(executable, input_filename, output_template, **params):
+    '''Runs the simulation with the given parameters'''
 
     output_filename = output_template.format(**params)
     
@@ -62,4 +65,9 @@ def run_param_sweep(executable, input_filename, param_name, values, fixed_params
         output_template = f"output_{param_name}_{{{param_name}}}.out"
         outname, result = run_simulation(executable, input_filename, output_template, **params)
         outputs.append(outname)
+<<<<<<< HEAD
+
     return outputs
+=======
+    return outputs
+>>>>>>> 3a4e8e688516d8466f6f22cf8394ff9f82dbfc7f

@@ -1,0 +1,12 @@
+tFin = 3153600000 
+m1 = 1.98892e30
+m2 = 1.89813e27
+v0x= -11000
+v0y= 2000
+a = 778.479e9
+nsel_physics = 2
+adapt = true
+tol = 30
+sampling = 1 //frequency of data writing
+output = output.out
+nsteps = 3000 
