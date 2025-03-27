@@ -17,8 +17,11 @@ params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
-outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [8000,10000,90000], {"adapt": 0, "tol": 30})
-outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [1,0.1,0.01], {"adapt": True, "nsteps": 1000})
+#outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [8000,10000,90000], {"adapt": 0, "tol": 30})
+#outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [1,0.1,0.01], {"adapt": True, "nsteps": 1000})
+
+outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [90000], {"adapt": 0, "tol": 30})
+outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [0.01], {"adapt": True, "nsteps": 1000})
 
 
 def read_output_file(filename):
@@ -44,7 +47,8 @@ def plot_energy(t, energy, label=""):
     plt.ylabel("Energie per mass [J/kg]")
     plt.grid(True)
 
-
+'''
+#TRAJECTORY AND ENERGY PLOTS
 #Fixed time step
 for output in outputs_nsteps:
     t, x, y, vx, vy, energy = read_output_file(output)
@@ -62,11 +66,10 @@ for output in outputs_nsteps:
     Line2D([0], [0], marker='o', color='yellow', label='Sun', markersize=10, linestyle='None'),
     Line2D([0], [0], marker='o', color='red', label='Initial position', markersize=10, linestyle='None'),
     Line2D([0], [0], marker='o', color='blue', label='Final position', markersize=10, linestyle='None'),
-    Line2D([], [], color='black', label=n_label)
+    Line2D([], [], label=n_label)
 ]
 
     plt.legend(handles=legend_elements)
-    plt.legend()
     plt.axis("equal")
     plt.savefig(f"traja_{label}.pdf")
     plt.show()
@@ -100,7 +103,7 @@ for output in outputs_tol:
     Line2D([0], [0], marker='o', color='yellow', label='Sun', markersize=10, linestyle='None'),
     Line2D([0], [0], marker='o', color='red', label='Initial position', markersize=10, linestyle='None'),
     Line2D([0], [0], marker='o', color='blue', label='Final position', markersize=10, linestyle='None'),
-    Line2D([], [], color='black', label=eps_label)
+    Line2D([], [], label=eps_label)
 ]
 
     plt.legend(handles=legend_elements)
@@ -115,4 +118,61 @@ for output in outputs_tol:
     plot_energy(t, energy, label=eps_label)
     plt.legend()
     plt.savefig(f"energiea_adapt_{label}.pdf")
+    plt.show()
+'''
+
+
+
+
+#COMPARISON OF NUMERICAL AND THEORETICAL VALUES FOR r_min,r_max,v_min,v_max
+G = 6.67430e-11
+E = 0.5*(v0x**2+v0y**2)-(G*m1)/x0
+L = x0*v0y
+e = np.sqrt(1 + 2*E*L**2/(G**2*m1**2))
+a_orb = -G*m1/(2*E)
+r_min_th = a_orb*(1-e)
+r_max_th = a_orb*(1+e)
+v_min_th = np.sqrt(2*(E+G*m1/r_max_th))
+v_max_th = np.sqrt(2*(E+G*m1/r_min_th))
+
+def compute_min_max(x,y,vx,vy):
+    r = np.sqrt(x**2+y**2)
+    v = np.sqrt(vx**2+vy**2)
+    return np.min(r), np.max(r), np.min(v), np.max(v)
+
+for outputs in outputs_nsteps:
+    t, x, y, vx, vy, energy = read_output_file(outputs)
+    r_min, r_max, v_min, v_max = compute_min_max(x,y,vx,vy)
+    label = outputs.split("_")[-1].replace(".out", "")
+    print(f"\n--- nsteps = {label} ---")
+    print(f"  r_min num = {r_min:.3e} m   | r_min th = {r_min_th:.3e} m")
+    print(f"  r_max num = {r_max:.3e} m   | r_max th = {r_max_th:.3e} m")
+    print(f"  v_min num = {v_min:.2f} m/s | v_min th = {v_min_th:.2f} m/s")
+    print(f"  v_max num = {v_max:.2f} m/s | v_max th = {v_max_th:.2f} m/s")
+
+for outputs in outputs_tol:
+    t, x, y, vx, vy, energy = read_output_file(outputs)
+    r_min, r_max, v_min, v_max = compute_min_max(x,y,vx,vy)
+    label = outputs.split("_")[-1].replace(".out", "")
+    print(f"\n--- epsilon = {label} ---")
+    print(f"  r_min num = {r_min:.3e} m   | r_min th = {r_min_th:.3e} m")
+    print(f"  r_max num = {r_max:.3e} m   | r_max th = {r_max_th:.3e} m")
+    print(f"  v_min num = {v_min:.2f} m/s | v_min th = {v_min_th:.2f} m/s")
+    print(f"  v_max num = {v_max:.2f} m/s | v_max th = {v_max_th:.2f} m/s")
+
+
+
+#VARIATION OF TIME STEP WITH ADAPTIVE TIME STEP
+for output in outputs_tol:
+    t, x, y, vx, vy, energy = read_output_file(output)
+    label = output.split("_")[-1].replace(".out", "")
+    eps_label = f"epsilon = {label}"
+
+    dt = np.diff(t)
+    plt.plot(t[:-1], dt, label=eps_label)
+    plt.xlabel("t [s]")
+    plt.ylabel("Δt [s]")
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(f"dt_adapt_{label}.pdf")
     plt.show()
