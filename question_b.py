@@ -15,7 +15,7 @@ params = fct.read_in_file(input_filename)
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
 #outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", [1000], {"adapt": 0, "tol": 30})
-outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [1e-3], {"adapt": 1, "nsteps": 8000})
+outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [1e-6], {"adapt": 1, "nsteps": 8000})
 
 plt.figure()
 plt.title("Trajectories")
