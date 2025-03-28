@@ -1,0 +1,11 @@
+[33mcommit 2f981262e04016bf54ebe66abc98b769f1a0bd55[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: Avril <avrilaroundtheworld@gmail.com>
+Date:   Fri Mar 28 16:06:37 2025 +0100
+
+    boop
+
+[33mcommit f96036801629d1eb9a693f04e227be2b05f88feb[m
+Author: Avril <avrilaroundtheworld@gmail.com>
+Date:   Fri Mar 28 16:05:01 2025 +0100
+
+    clean du code, subfolders, moved functions in question a to functions.py
