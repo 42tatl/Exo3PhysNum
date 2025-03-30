@@ -33,12 +33,12 @@ def plot_energy(t, energy, label=""):
     plt.xlabel(r'$t$ [s]',fontsize=14)
     plt.xticks(fontsize=12)  
     plt.yticks(fontsize=12)
-    plt.ylabel(r'\frac{E}{m} [J $\cdot$ kg$^{-1}$]',fontsize=14)
+    plt.ylabel(r'$\frac{E}{m}$ [J $\cdot$ kg$^{-1}$]',fontsize=14)
     plt.grid(True)
     plt.tight_layout()
 
 for output in outputs_tol:
-    t, x, y, vx, vy, energy = fct.read_output_file(output)
+    t, x, y, vx, vy, energy, nsteps = fct.read_output_file(output)
     label = output.split("_")[-1].replace(".out", "")
     eps_label = f"epsilon = {label}"   
     plot_trajectory(x, y, label=eps_label)
@@ -64,7 +64,7 @@ for output in outputs_tol:
     plt.show()
 
 for output in outputs_tol:
-    t, x, y, vx, vy, energy = fct.read_output_file(output)
+    t, x, y, vx, vy, energy, nsteps = fct.read_output_file(output)
     label = output.split("_")[-1].replace(".out", "")
     eps_label = f"epsilon = {label}"   
     plot_energy(t, energy, label=eps_label)
@@ -90,7 +90,7 @@ def compute_min_max(x,y,vx,vy):
     return np.min(r), np.max(r), np.min(v), np.max(v)
 
 for outputs in outputs_tol:
-    t, x, y, vx, vy, energy = fct.read_output_file(outputs)
+    t, x, y, vx, vy, energy, nsteps = fct.read_output_file(outputs)
     r_min, r_max, v_min, v_max = compute_min_max(x,y,vx,vy)
     label = outputs.split("_")[-1].replace(".out", "")
     print(f"\n--- epsilon = {label} ---")
@@ -102,7 +102,7 @@ for outputs in outputs_tol:
 
 #VARIATION OF TIME STEP
 for output in outputs_tol:
-    t, x, y, vx, vy, energy = fct.read_output_file(output)
+    t, x, y, vx, vy, energy, nsteps = fct.read_output_file(output)
     label = output.split("_")[-1].replace(".out", "")
     eps_label = f"epsilon = {label}"
     dt = np.diff(t)
@@ -119,4 +119,7 @@ for output in outputs_tol:
     plt.show()
 
 #CONVERGENCE OF FINAL POSITION
-#Comment recuperer jsteps??
+for output in outputs_tol:
+    t, x, y, vx, vy, energy, nsteps = fct.read_output_file(output)
+    print("nsteps =", nsteps[-1])
+    
