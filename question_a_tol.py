@@ -117,3 +117,6 @@ for output in outputs_tol:
     plt.tight_layout()
     fct.save_figure(f"dt_adapt_{label}.pdf")
     plt.show()
+
+#CONVERGENCE OF FINAL POSITION
+#Comment recuperer jsteps??
