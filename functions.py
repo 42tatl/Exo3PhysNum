@@ -55,6 +55,12 @@ def run_simulation(executable, input_filename, output_template, **params):
     # Run the command
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
 
+    print("----- STDOUT -----")
+    print(result.stdout)
+
+    print("----- STDERR -----")
+    print(result.stderr)
+
     # Check result
     if os.path.exists(output_filename):
         print(f" SUCCESS: Output file '{output_filename}' was created!")
@@ -65,14 +71,15 @@ def run_simulation(executable, input_filename, output_template, **params):
 
 def run_param_sweep(executable, input_filename, param_name, values, fixed_params):
     outputs = []
+    param_list = []
     for val in values:
         params = fixed_params.copy()
         params[param_name] = val
         output_template = f"output_{param_name}_{{{param_name}}}.out"
         outname, result = run_simulation(executable, input_filename, output_template, **params)
         outputs.append(outname)
-
-    return outputs
+        param_list.append(params.copy())  # Store each individual param set
+    return outputs, param_list
 
 
 def save_figure(filename, fig=None, subfolder="figures", dpi=300, tight=True):

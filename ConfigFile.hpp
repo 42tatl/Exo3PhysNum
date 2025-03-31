@@ -167,3 +167,4 @@ std::string ConfigFile::trim(const std::string& str)
     size_t last = str.find_last_not_of(" \t\r"); // find last white space
     return str.substr(first, (last-first+1)); // return string without white spaces
 }
+

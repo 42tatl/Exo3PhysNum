@@ -84,7 +84,7 @@ double get_Epot(double xx, double yy) {
     if (nsel_physics==1) {
       double r = sqrt(pow(xx,2)+pow(yy,2));
 
-      V= -GM * m[0] / r; //PB: POURQUOI ON AURAIT M[0]+M[1] DANS LE CAS 1
+      V= -GM * m[0] / r; 
       return V;
     }
 
@@ -125,8 +125,8 @@ void initial_condition(void){
   }
   else{
     y[0] = v0[0];
-    y[1] = v0[1] - Omega*2*a;
-    y[2] = 2*a - alpha*a;
+    y[1] = v0[1] - Omega*x0;
+    y[2] = x0 - alpha*a;
     y[3] = 0;
   }
 }
@@ -156,8 +156,9 @@ public:
             inputPath = argv[1];
 
         ConfigFile configFile(inputPath);
-        for (int i = 2; i < argc; ++i)
-            configFile.process(argv[i]);
+        for (int i = 2; i < argc; ++i){
+          std::cout << "[CLI ARG] " << argv[i] << std::endl;
+          configFile.process(argv[i]);}
 
         tFin         = configFile.get<double>("tFin");
         m[0]         = configFile.get<double>("m1"); //sun mass
@@ -170,7 +171,7 @@ public:
         tol          = configFile.get<double>("tol");
         sampling     = configFile.get<int>("sampling");
         nsteps       = configFile.get<int>("nsteps");
-
+        x0 = 2*a; 
         mtot = m[0] + m[1];
         alpha = m[1] / mtot;
         beta  = m[0] / mtot;
@@ -211,13 +212,13 @@ public:
 
         while (t < tFin) {
             dt = min(dt, tFin - t);
-            ++jsteps;
 
             valarray<double> y_full  = RK4_do_onestep(y, t, dt);
             valarray<double> y_half1 = RK4_do_onestep(y, t, dt / 2.0);
             valarray<double> y_half2 = RK4_do_onestep(y_half1, t + dt / 2.0, dt / 2.0);
             double d = abs(y_full - y_half2).sum();
-
+            cout << "[ACCEPTED] t = " << t << ", dt = " << dt << ", d = " << d << ", tol = " << tol << endl;
+            int refinements = 0;
             if (d <= tol) {
                 y = y_half2;
                 t += dt;
@@ -225,18 +226,23 @@ public:
             } 
             else {
                 while (d > tol) {
+                    ++refinements;
                     dt = f * dt * pow(tol / d, 1.0 / (n + 1));
                     y_full  = RK4_do_onestep(y, t, dt);
                     y_half1 = RK4_do_onestep(y, t, dt / 2.0);
                     y_half2 = RK4_do_onestep(y_half1, t + dt / 2.0, dt / 2.0);
                     d = abs(y_full - y_half2).sum();
+                    cout << "[REFINING] t = " << t << ", dt = " << dt << ", d = " << d << ", tol = " << tol << endl;
                 }
                 y = y_half2;
                 t += dt;
+                ++jsteps;
             }
 
             printOut(false); // Regular sampling
         }
+        cout << "Total accepted steps: " << jsteps << endl;
+        cout << "Final time: " << t << endl;
     }
 
     printOut(true); // Final output
