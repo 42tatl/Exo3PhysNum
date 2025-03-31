@@ -27,7 +27,7 @@ rad_J = 6.9911e7
 plt.figure()
 
 for output, param in zip(outputs_nsteps, params):  # zip them properly now
-    t, vx, vy, x, y, E, nsteps = np.loadtxt(output, unpack=True)
+    t, vx, vy, x, y, E, nsteps = fct.read_output_file(output, unpack=True)
     plt.plot(x, y, label=rf"$nsteps$ = {int(param['nsteps'])}")
     
 plt.grid()
