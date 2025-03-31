@@ -16,7 +16,7 @@ params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
-outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", np.logspace(4,6,num=10), {"adapt": 0, "tol": 30})
+outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", np.logspace(4 ,5,num=10), {"adapt": 0, "tol": 30})
 
 def plot_trajectory(x, y, label=""):
     plt.plot(x, y, label=label)
