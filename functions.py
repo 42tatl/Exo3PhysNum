@@ -114,4 +114,5 @@ def read_output_file(filename):
     d = data[:, 1]
     e = data[:, 2]
     f = data[:, 5]
-    return a,b,c,d,e,f
+    g = data[:, 6] #j'ai besoin des nsteps
+    return a,b,c,d,e,f,g
