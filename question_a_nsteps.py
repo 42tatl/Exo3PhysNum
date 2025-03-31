@@ -16,7 +16,7 @@ params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
-outputs_nsteps = fct.run_param_sweep(executable, input_filename, "nsteps", np.logspace(4 ,5,num=10), {"adapt": 0, "tol": 30})
+outputs_nsteps, parameters = fct.run_param_sweep(executable, input_filename, "nsteps", np.logspace(4 ,5,num=10), {"adapt": 0})
 
 def plot_trajectory(x, y, label=""):
     plt.plot(x, y, label=label)
@@ -38,7 +38,7 @@ def plot_energy(t, energy, label=""):
 
 '''
 #TRAJECTORY AND ENERGY PLOTS
-for output in outputs_nsteps:
+for output, param in zip(outputs_nsteps, parameters):
     t, x, y, vx, vy, energy,nsteps = fct.read_output_file(output)
     label = output.split("_")[-1].replace(".out", "")
     n_label = f"nsteps = {label}"   
@@ -63,7 +63,7 @@ for output in outputs_nsteps:
     plt.show()
 
 
-for output in outputs_nsteps:
+for output, param in zip(outputs_nsteps, parameters):
     t, x, y, vx, vy, energy,nsteps = fct.read_output_file(output)
     label = output.split("_")[-1].replace(".out", "")
     n_label = f"nsteps = {label}"  
@@ -71,9 +71,9 @@ for output in outputs_nsteps:
     plt.legend()
     fct.save_figure(f"energiea_{label}.pdf")
     plt.show()
-
-
 '''
+
+
 #COMPARISON OF NUMERICAL AND THEORETICAL VALUES FOR r_min,r_max,v_min,v_max
 G = 6.67430e-11
 E = 0.5*(v0x**2+v0y**2)-(G*m1)/x0
@@ -90,7 +90,7 @@ def compute_min_max(x,y,vx,vy):
     v = np.sqrt(vx**2+vy**2)
     return np.min(r), np.max(r), np.min(v), np.max(v)
 
-for output in outputs_nsteps:
+for output, param in zip(outputs_nsteps, parameters):
     t, x, y, vx, vy, energy,nsteps = fct.read_output_file(output)
     r_min, r_max, v_min, v_max = compute_min_max(x,y,vx,vy)
     label = output.split("_")[-1].replace(".out", "")
@@ -102,33 +102,63 @@ for output in outputs_nsteps:
 '''
 
 
-
+'''
 #CONVERGENCE OF FINAL POSITION
+#30000,35000,40000,45000,50000,80000,1e5,1e6
+#80e3,90e3,100e3,130e3,150e3,180e3,200e3,250e3,300e3,400e3
+outputs_nsteps, parameters = fct.run_param_sweep(executable, input_filename, "nsteps", [80e3,90e3,100e3,130e3,150e3,180e3,200e3,250e3], {"adapt": 0})
 nsteps_tot = []
+xfin = []
+yfin = []
 pos_final = []
 delta_ts_four = []
 
-for output in outputs_nsteps:
+for output, param in zip(outputs_nsteps, parameters):
     t, x, y, vx, vy, energy,nsteps = fct.read_output_file(output)
-    #nsteps = int(float(label))
     nsteps_tot.append(nsteps[-1])
-    #print(f"nsteps = {nsteps}")
+    xfin.append(x[-1])
+    yfin.append(y[-1])
     pos_final.append(np.sqrt(x[-1]**2+y[-1]**2))
     delta_ts_four.append((tFin/nsteps[-1])**4)
 
 
 plt.plot(delta_ts_four, pos_final, marker='o', linestyle='-', color='b', label="Non-adaptive")
-plt.xlabel(r'$(\Delta t)^4$ [s]',fontsize=14)
+plt.xlabel(r'$(\Delta t)^4$ [s$^4$]',fontsize=14)
 plt.ylabel(r'$r_{fin}$ [m]',fontsize=14)
 plt.xticks(fontsize=12)  
 plt.yticks(fontsize=12)
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-fct.save_figure(f"conv_pos_nsteps.pdf")
+fct.save_figure(f"conv_pos_nsteps_1.pdf")
 plt.show()
 
+plt.plot(delta_ts_four, xfin, marker='o', linestyle='-', color='b', label="Non-adaptive")
+plt.xlabel(r'$(\Delta t)^4$ [s$^4$]',fontsize=14)
+plt.ylabel(r'$x_{fin}$ [m]',fontsize=14)
+plt.xticks(fontsize=12)  
+plt.yticks(fontsize=12)
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+fct.save_figure(f"conv_pos_nsteps_2.pdf")
+plt.show()
+
+plt.plot(delta_ts_four, yfin, marker='o', linestyle='-', color='b', label="Non-adaptive")
+plt.xlabel(r'$(\Delta t)^4$ [s$^4$]',fontsize=14)
+plt.ylabel(r'$y_{fin}$ [m]',fontsize=14)
+plt.xticks(fontsize=12)  
+plt.yticks(fontsize=12)
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+fct.save_figure(f"conv_pos_nsteps_3.pdf")
+plt.show()
+'''
+
+
 #CONVERGENCE OF ENERGY
+outputs_nsteps, parameters = fct.run_param_sweep(executable, input_filename, "nsteps", np.logspace(5,6,num=10), {"adapt": 0})
 nsteps_tot_e = []
 diff_energy = []
 Efinal = []
@@ -136,7 +166,7 @@ dts_four = []
 erreur_E = []
 
 
-for output in outputs_nsteps:
+for output, param in zip(outputs_nsteps, parameters):
     t, x, y, vx, vy, energy,nsteps = fct.read_output_file(output)
     #nsteps = int(float(label))
     nsteps_tot_e.append(nsteps[-1])
@@ -149,24 +179,25 @@ for output in outputs_nsteps:
 
 ref_n = np.array(nsteps_tot_e, dtype=float)
 ref_y = ref_n**(-4)
-ref_curve = 1e20 * ref_n**(-4)
+ref_curve = diff_energy[0] * (ref_n / ref_n[0])**(-4)
 
 
-plt.loglog(nsteps_tot_e, diff_energy, marker='o', linestyle='-', color='b', label="Non-adaptive") #Qu'est ce qu'on doit plotter?
+plt.loglog(nsteps_tot_e, diff_energy, marker='o', linestyle='-', color='b', label="Non-adaptive") 
 plt.plot(ref_n, ref_curve, '-', color='r', label=r"$\propto \Delta n^{-4}$")
 plt.xlabel(r'$n_{steps}$',fontsize=14)
 plt.ylabel(r'$\frac{\left| E_{max} - E_{min} \right|}{m}$ [J $\cdot$ kg$^{-1}$]',fontsize=14)
-plt.xticks(fontsize=12)  
+plt.xticks(fontsize=12)
+plt.tick_params(axis='x', which='both', length=5)
 plt.yticks(fontsize=12)
-plt.xlim(1e4, 1e6)
+plt.xlim(1e5, 1e6)
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-fct.save_figure(f"conv_energy_nsteps.pdf")
+fct.save_figure(f"conv_energy_nsteps_1.pdf")
 plt.show()
 
 plt.plot(dts_four, Efinal, marker='o', linestyle='-', color='b', label="Non-adaptive") 
-plt.xlabel(r'$(\Delta )^4$ [s]',fontsize=14)
+plt.xlabel(r'$(\Delta t)^4$ [s$^4$]',fontsize=14)
 plt.ylabel(r'$\frac{E_{fin}}{m}$ [J $\cdot$ kg$^{-1}$]',fontsize=14)
 plt.xticks(fontsize=12)  
 plt.yticks(fontsize=12)
@@ -176,6 +207,7 @@ plt.tight_layout()
 fct.save_figure(f"conv_energy_nsteps_2.pdf")
 plt.show()
 
+'''
 plt.loglog(nsteps_tot_e, erreur_E, marker='o', linestyle='-', color='b', label="Non-adaptive") 
 plt.plot(ref_n, ref_curve, '-', color='r', label=r"$\propto \Delta n^{-4}$")
 plt.xlabel(r'$n_{steps}$',fontsize=14)
@@ -186,4 +218,5 @@ plt.grid(True)
 plt.legend()
 plt.tight_layout()
 fct.save_figure(f"conv_energy_nsteps_3.pdf")
-plt.show()
+plt.show()'
+'''

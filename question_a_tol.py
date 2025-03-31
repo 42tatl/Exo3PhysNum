@@ -16,7 +16,7 @@ params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
-outputs_tol, params = fct.run_param_sweep(executable, input_filename, "tol", [1e-4,1e-3,0.01,0.1,10,100,1e7], {"adapt": True, "nsteps": 1000})
+outputs_tol, parameters = fct.run_param_sweep(executable, input_filename, "tol", [1e-4,1e-3,0.01,0.1,10,100,1e7], {"adapt": True, "nsteps": 1000})
 
 def plot_trajectory(x, y, label=""):
     plt.plot(x, y, label=label)
@@ -37,7 +37,7 @@ def plot_energy(t, energy, label=""):
     plt.grid(True)
     plt.tight_layout()
 
-for output in outputs_tol:
+for output, param in zip(outputs_tol, parameters):
     t, x, y, vx, vy, energy, nsteps = fct.read_output_file(output)
     label = output.split("_")[-1].replace(".out", "")
     eps_label = f"epsilon = {label}"   
