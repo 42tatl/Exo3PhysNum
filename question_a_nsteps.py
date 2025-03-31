@@ -5,7 +5,7 @@ from matplotlib.lines import Line2D
 import os
 import functions as fct
 
-executable = './Exe'  # Remove .exe for Mac
+executable = './Exe2'  # Remove .exe for Mac
 repertoire = r"/Users/lilimouelle/Desktop/PHYSNUM/Exo3PhysNum"  # Modify for correct directory
 os.chdir(repertoire)
 

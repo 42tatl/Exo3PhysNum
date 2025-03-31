@@ -5,7 +5,7 @@ from matplotlib.lines import Line2D
 import os
 import functions as fct
 
-executable = './Exe'  # Remove .exe for Mac
+executable = './Exe2'  # Remove .exe for Mac
 repertoire = r"/Users/lilimouelle/Desktop/PHYSNUM/Exo3PhysNum"  # Modify for correct directory
 os.chdir(repertoire)
 
@@ -16,7 +16,7 @@ params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
 
-outputs_tol = fct.run_param_sweep(executable, input_filename, "tol", [1e-4,1e-3,0.01,0.1,10,100,1e7], {"adapt": True, "nsteps": 1000})
+outputs_tol, params = fct.run_param_sweep(executable, input_filename, "tol", [1e-4,1e-3,0.01,0.1,10,100,1e7], {"adapt": True, "nsteps": 1000})
 
 def plot_trajectory(x, y, label=""):
     plt.plot(x, y, label=label)
@@ -62,7 +62,7 @@ for output in outputs_tol:
     plt.axis("equal")
     fct.save_figure(f"traja_adapt_{label}.pdf")
     plt.show()
-
+'''
 for output in outputs_tol:
     t, x, y, vx, vy, energy, nsteps = fct.read_output_file(output)
     label = output.split("_")[-1].replace(".out", "")
@@ -89,10 +89,10 @@ def compute_min_max(x,y,vx,vy):
     v = np.sqrt(vx**2+vy**2)
     return np.min(r), np.max(r), np.min(v), np.max(v)
 
-for outputs in outputs_tol:
-    t, x, y, vx, vy, energy, nsteps = fct.read_output_file(outputs)
+for output in outputs_tol:
+    t, x, y, vx, vy, energy, nsteps = fct.read_output_file(output)
     r_min, r_max, v_min, v_max = compute_min_max(x,y,vx,vy)
-    label = outputs.split("_")[-1].replace(".out", "")
+    label = output.split("_")[-1].replace(".out", "")
     print(f"\n--- epsilon = {label} ---")
     print(f"  r_min num = {r_min:.3e} m   | r_min th = {r_min_th:.3e} m")
     print(f"  r_max num = {r_max:.3e} m   | r_max th = {r_max_th:.3e} m")
@@ -122,4 +122,4 @@ for output in outputs_tol:
 for output in outputs_tol:
     t, x, y, vx, vy, energy, nsteps = fct.read_output_file(output)
     print("nsteps =", nsteps[-1])
-    
+'''
