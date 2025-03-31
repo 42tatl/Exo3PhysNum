@@ -206,7 +206,7 @@ public:
     } 
     else {
         cout << "Adaptive case" << endl;
-        double jsteps = 0;
+        nsteps = 0;
         const int n = 4;
         const double f = 0.9;
 
@@ -236,12 +236,11 @@ public:
                 }
                 y = y_half2;
                 t += dt;
-                ++jsteps;
             }
-
+            ++nsteps;
             printOut(false); // Regular sampling
         }
-        cout << "Total accepted steps: " << jsteps << endl;
+        cout << "Total accepted steps: " << nsteps << endl;
         cout << "Final time: " << t << endl;
     }
 

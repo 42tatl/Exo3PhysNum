@@ -107,7 +107,7 @@ def save_figure(filename, fig=None, subfolder="figures", dpi=300, tight=True):
     print(f"Figure saved to {filepath}")
 
 def read_output_file(filename):
-    data = np.loadtxt(filename, unpack=True)
+    data = np.loadtxt(filename)
     a = data[:, 0]
     b = data[:, 3]
     c = data[:, 4]
