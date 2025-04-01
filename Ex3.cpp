@@ -16,7 +16,8 @@ private:
   double GM=6.674e-11;
   double mtot=0e0;
   double Omega;
-  valarray<double> m = std::valarray<double>(0.e0, 2);
+  double mJ;
+  double mS;
   valarray<double> v0 = std::valarray<double>(0.e0, 2);
   int N_excit, nsteps;
   int sampling;
@@ -50,10 +51,10 @@ private:
     //TO DO
     if (nsel_physics == 1) { //two body problem 
       
-      double r = sqrt(pow(y[2],2)+ pow(y[3],2)); //y = (vx, vy, x, y) PROBLEME ICI: PQ ON PREND PAS X_S
+      double r = sqrt(pow(y[2],2)+ pow(y[3],2)); //y = (vx, vy, x, y) 
     
-      ydot[0] = -(GM*m[0]*y[2])/pow(r,3); 
-      ydot[1] = -(GM*m[0]*y[3])/pow(r,3);
+      ydot[0] = -(GM*mS*y[2])/pow(r,3); 
+      ydot[1] = -(GM*mS*y[3])/pow(r,3);
     }
     else if (nsel_physics == 2) { //reduced three body problem
       double x_prime_S = -alpha*a; 
@@ -62,8 +63,8 @@ private:
       double rS = sqrt( pow(y[2] - x_prime_S,2)+pow( y[3],2) );
       double rJ = sqrt( pow(y[2] - x_prime_J,2)+pow( y[3],2) ); //y = (vx, vy, x, y)
             
-      ydot[0] = -GM * (m[0]/pow(rS, 3)*(y[2] - x_prime_S) - m[1]/pow(rJ, 3)*(y[2] - x_prime_J)) +pow(Omega,2)*y[2] + 2*Omega*y[1];
-      ydot[1] =  -GM * y[3] * (m[0]/pow(rJ, 3) - m[1]/pow(rJ, 3)) + pow(Omega,2)*y[3] - 2*Omega*y[0];
+      ydot[0] = (-GM * mS * (y[2] - x_prime_S) ) /pow(rS, 3) - (GM * mJ *(y[2] - x_prime_J))/pow(rJ, 3) +pow(Omega,2) * y[2] + 2*Omega*y[1];
+      ydot[1] = - (GM * y[3] * mS) /pow(rJ, 3) - (GM * mJ * y[3]) /pow(rJ, 3) + pow(Omega,2)*y[3] - 2 * Omega * y[0];
     }
     else{
         cerr << "No dynamics corresponds to this index" << endl;
@@ -84,7 +85,7 @@ double get_Epot(double xx, double yy) {
     if (nsel_physics==1) {
       double r = sqrt(pow(xx,2)+pow(yy,2));
 
-      V= -GM * m[0] / r; 
+      V= -GM * mS / r; 
       return V;
     }
 
@@ -96,7 +97,7 @@ double get_Epot(double xx, double yy) {
       double rS = sqrt( pow((xx - x_prime_S ),2) + pow( yy,2) ); 
       double rJ = sqrt( pow((xx- x_prime_J ),2) + pow( yy,2) );  
 
-      V = - GM * (m[0]/rS + m[1]/rJ) - 0.5*pow(Omega,2)*(pow(xx,2)+pow(yy,2));
+      V = - GM * (mS/rS + mJ/rJ) - 0.5*pow(Omega,2)*(pow(xx,2)+pow(yy,2));
       return V;
     }
     else{
@@ -118,16 +119,19 @@ double compute_energy(double vx, double vy, double xx, double yy) { //PER MASS
 }
 void initial_condition(void){
   if(nsel_physics==1){
-    y[0] = v0[0];
-    y[1] = v0[1];
-    y[2] = 2*a;
+    x0 = 2*a;
+    y[0] = v0[0]; //vx0
+    y[1] = v0[1]; //vy0
+    y[2] = x0; //x0
     y[3] = 0;
   }
   else{
-    y[0] = v0[0];
-    y[1] = v0[1] - Omega*x0;
-    y[2] = x0 - alpha*a;
-    y[3] = 0;
+    double xS = alpha*a; 
+    x0 = 2*a + xS; 
+    y[0] = v0[0]; //vx'0
+    y[1] = v0[1] - Omega*x0; //vy'0
+    y[2] = x0; //x'0
+    y[3] = 0; //y'0
   }
 }
 
@@ -161,8 +165,8 @@ public:
           configFile.process(argv[i]);}
 
         tFin         = configFile.get<double>("tFin");
-        m[0]         = configFile.get<double>("m1"); //sun mass
-        m[1]         = configFile.get<double>("m2"); //jupiter mass
+        mS         = configFile.get<double>("m1"); //sun mass
+        mJ         = configFile.get<double>("m2"); //jupiter mass
         v0[0]          = configFile.get<double>("v0x");
         v0[1]         = configFile.get<double>("v0y");
         a            = configFile.get<double>("a");
@@ -170,16 +174,15 @@ public:
         adapt        = configFile.get<bool>("adapt");
         tol          = configFile.get<double>("tol");
         sampling     = configFile.get<int>("sampling");
-        nsteps       = configFile.get<int>("nsteps");
-        x0 = 2*a; 
-        mtot = m[0] + m[1];
-        alpha = m[1] / mtot;
-        beta  = m[0] / mtot;
-        Omega = sqrt(GM*(mtot)/pow(a,3));
+        nsteps       = configFile.get<int>("nsteps"); 
+        mtot = mS + mJ; // Total mass of the system
+        alpha = mJ / mtot;
+        beta  = mS / mtot;
+        Omega = sqrt(GM*mtot/pow(a,3));
+        dt = tFin / nsteps;
         outputFile = new ofstream(configFile.get<string>("output").c_str());
         outputFile->precision(15);
-
-        dt = tFin / nsteps;
+        
     }
 
     ~Exercice3()
