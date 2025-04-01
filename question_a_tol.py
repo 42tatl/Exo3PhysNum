@@ -16,8 +16,8 @@ output_template = "output_{paramstr}_{value}.out"
 params = fct.read_in_file(input_filename)
 
 tFin, m1, m2, x0, v0x, v0y, a, tol = fct.get_params(params)
-
-outputs_tol, parameters = fct.run_param_sweep(executable, input_filename, "tol", [1e-3,100,1e7], {"adapt": True, "nsteps": 1000})
+'''
+outputs_tol, parameters = fct.run_param_sweep(executable, input_filename, "tol", [100], {"adapt": True, "nsteps": 1000})
 
 def plot_trajectory(x, y, label=""):
     plt.plot(x, y, label=label)
@@ -37,8 +37,11 @@ def plot_energy(t, energy, label=""):
     plt.ylabel(r'$\frac{E}{m}$ [J $\cdot$ kg$^{-1}$]',fontsize=14)
     plt.grid(True)
     plt.tight_layout()
+'''
+    
 
 
+'''
 #TRAJECTORY
 for output, param in zip(outputs_tol, parameters):
     t, x, y, vx, vy, energy, nsteps = fct.read_output_file(output)
@@ -62,11 +65,11 @@ for output, param in zip(outputs_tol, parameters):
     Line2D([], [], label=eps_label)
 ]
 
-    plt.legend(handles=legend_elements)
+    plt.legend(handles=legend_elements,fontsize=14)
     plt.axis("equal")
     fct.save_figure(f"traja_adapt_{label}.pdf")
     plt.show()
-
+'''
 
 '''
 #COMPARISON OF NUMERICAL AND THEORETICAL VALUES FOR r_min,r_max,v_min,v_max
@@ -96,7 +99,9 @@ for output, param in zip(outputs_tol, parameters):
     print(f"  v_max num = {v_max:.2f} m/s | v_max th = {v_max_th:.2f} m/s")
 
 
+'''
 
+'''
 #VARIATION OF TIME STEP
 for output, param in zip(outputs_tol, parameters):
     t, x, y, vx, vy, energy, nsteps = fct.read_output_file(output)
@@ -107,9 +112,9 @@ for output, param in zip(outputs_tol, parameters):
     #plt.yscale("log")
     plt.xlabel(r'$t$ [s]',fontsize=14)
     plt.ylabel(r'$\Delta t$ [s]',fontsize=14)
-    plt.xticks(fontsize=12)  
-    plt.yticks(fontsize=12) 
-    plt.legend()
+    plt.xticks(fontsize=15)  
+    plt.yticks(fontsize=15) 
+    plt.legend(fontsize=14)
     plt.grid(True)
     plt.tight_layout()
     fct.save_figure(f"dt_adapt_{label}.pdf")
@@ -117,7 +122,7 @@ for output, param in zip(outputs_tol, parameters):
 '''
 
 
-'''
+
 #CONVERGENCE OF FINAL POSITION
 outputs_tol, parameters = fct.run_param_sweep(executable, input_filename, "tol", np.logspace(-2,-1,num=10), {"adapt": True, "nsteps": 1000})
 nsteps_tot = []
@@ -191,7 +196,7 @@ for output, param in zip(outputs_tol, parameters):
 
 ref_n = np.array(nsteps_tot_e, dtype=float)
 ref_y = ref_n**(-4)
-ref_curve = 1e2 * (ref_n / ref_n[0])**(-4)
+ref_curve = 10 * (ref_n / ref_n[0])**(-4)
 
 
 plt.loglog(nsteps_tot_e, diff_energy, marker='o', linestyle='-', color='b', label="Adaptive") 
@@ -216,5 +221,5 @@ plt.legend()
 plt.tight_layout()
 fct.save_figure(f"conv_energy_tol_2.pdf")
 plt.show()
-'''
+
 

@@ -58,7 +58,7 @@ for output, param in zip(outputs_nsteps, parameters):
     Line2D([], [], label=n_label)
 ]
 
-    plt.legend(handles=legend_elements)
+    plt.legend(handles=legend_elements,fontsize=14)
     plt.axis("equal")
     fct.save_figure(f"traja_{label}.pdf")
     plt.show()
@@ -90,7 +90,7 @@ for output, param in zip(outputs_nsteps, parameters):
     print(f"  v_min num = {v_min:.2f} m/s | v_min th = {v_min_th:.2f} m/s")
     print(f"  v_max num = {v_max:.2f} m/s | v_max th = {v_max_th:.2f} m/s")
 
-
+'''
 
 
 #CONVERGENCE OF FINAL POSITION
@@ -241,4 +241,3 @@ plt.legend()
 plt.tight_layout()
 fct.save_figure("conv_energy_compare1.pdf")
 plt.show()
-'''
